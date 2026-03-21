@@ -62,6 +62,8 @@ class InternshipService(
 
         val request = call.receive<InternshipRequest>()
         request.companyId = user.id
+        request.companyName = user.name
+        request.companyEmail = user.username
 
         val validator = ValidatorHelper(request.toMap())
         validator.required("title", "Judul lowongan tidak boleh kosong")
@@ -71,6 +73,7 @@ class InternshipService(
         validator.required("duration", "Durasi tidak boleh kosong")
         validator.required("requirement", "Kualifikasi tidak boleh kosong")
         validator.required("deadline", "Deadline tidak boleh kosong")
+        validator.required("submissionDate", "Tanggal pengajuan tidak boleh kosong")
         validator.validate()
 
         val internshipId = internshipRepo.create(request.toEntity())

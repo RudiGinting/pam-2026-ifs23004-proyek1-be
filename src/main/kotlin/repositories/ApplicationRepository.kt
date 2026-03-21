@@ -1,14 +1,15 @@
 package org.delcom.repositories
 
 import org.delcom.dao.ApplicationDAO
+import org.delcom.dao.InternshipDAO
 import org.delcom.entities.Application
 import org.delcom.helpers.applicationDAOToModel
 import org.delcom.helpers.suspendTransaction
 import org.delcom.tables.ApplicationTable
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
-import java.util.*
 import org.jetbrains.exposed.sql.deleteWhere
+import java.util.*
 
 class ApplicationRepository : IApplicationRepository {
     override suspend fun getByStudent(studentId: String, page: Int, perPage: Int): List<Application> = suspendTransaction {
@@ -43,6 +44,13 @@ class ApplicationRepository : IApplicationRepository {
             appliedAt = application.appliedAt
             updatedAt = application.updatedAt
         }
+
+        // Increment applicants_count
+        val internshipId = application.internshipId
+        InternshipDAO.findById(UUID.fromString(internshipId))?.let { internship ->
+            internship.applicantsCount = internship.applicantsCount + 1
+        }
+
         applicationDAO.id.value.toString()
     }
 

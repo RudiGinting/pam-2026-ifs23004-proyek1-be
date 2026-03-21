@@ -9,16 +9,21 @@ import java.util.UUID
 @Serializable
 data class Internship(
     var id: String = UUID.randomUUID().toString(),
-    var companyId: String, // ID perusahaan yang membuka lowongan
+    var companyId: String,
+    var companyName: String,
+    var companyEmail: String,
     var title: String,
     var description: String,
-    var category: String, // Bidang: IT, Marketing, Finance, dll
-    var location: String, // On-site, Remote, Hybrid
-    var duration: String, // Durasi magang (3 bulan, 6 bulan, dll)
-    var requirement: String, // Kualifikasi yang dibutuhkan
-    var benefit: String?, // Benefit yang didapat
-    var deadline: String, // Tanggal deadline pendaftaran
-    var cover: String?,
+    var category: String,
+    var location: String,
+    var duration: String,
+    var requirement: String,
+    var benefit: String? = null,
+    var deadline: String,
+    var status: String = "Open",
+    var applicantsCount: Int = 0,
+    var submissionDate: String,
+    var cover: String? = null,
 
     @Contextual
     val createdAt: Instant = Clock.System.now(),

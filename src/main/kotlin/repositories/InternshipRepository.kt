@@ -59,6 +59,8 @@ class InternshipRepository : IInternshipRepository {
     override suspend fun create(internship: Internship): String = suspendTransaction {
         val internshipDAO = InternshipDAO.new {
             companyId = UUID.fromString(internship.companyId)
+            companyName = internship.companyName
+            companyEmail = internship.companyEmail
             title = internship.title
             description = internship.description
             category = internship.category
@@ -67,6 +69,9 @@ class InternshipRepository : IInternshipRepository {
             requirement = internship.requirement
             benefit = internship.benefit
             deadline = internship.deadline
+            status = internship.status
+            applicantsCount = internship.applicantsCount
+            submissionDate = internship.submissionDate
             cover = internship.cover
             createdAt = internship.createdAt
             updatedAt = internship.updatedAt
@@ -81,6 +86,8 @@ class InternshipRepository : IInternshipRepository {
             .firstOrNull()
 
         if (internshipDAO != null) {
+            internshipDAO.companyName = newInternship.companyName
+            internshipDAO.companyEmail = newInternship.companyEmail
             internshipDAO.title = newInternship.title
             internshipDAO.description = newInternship.description
             internshipDAO.category = newInternship.category
@@ -89,6 +96,8 @@ class InternshipRepository : IInternshipRepository {
             internshipDAO.requirement = newInternship.requirement
             internshipDAO.benefit = newInternship.benefit
             internshipDAO.deadline = newInternship.deadline
+            internshipDAO.status = newInternship.status
+            internshipDAO.submissionDate = newInternship.submissionDate
             internshipDAO.cover = newInternship.cover
             internshipDAO.updatedAt = newInternship.updatedAt
             true

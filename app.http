@@ -1,5 +1,5 @@
 ## Global Variabel
-@BaseUrl = http://localhost:8080
+@BaseUrl = https://pam-2026-proyek1-ifs23004-be.rudijonathan.fun:8080/
 
 ### ---------------------------------------
 ## Auth
