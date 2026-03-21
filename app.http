@@ -1,0 +1,155 @@
+## Global Variabel
+@BaseUrl = http://localhost:8080
+
+### ---------------------------------------
+## Auth
+### ---------------------------------------
+
+### Melakukan pendaftaran (Student)
+# @name PostRegisterStudent
+POST {{BaseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Mahasiswa 1",
+  "username": "student1",
+  "password": "student123"
+}
+
+### Melakukan pendaftaran (Company)
+# @name PostRegisterCompany
+POST {{BaseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "PT Tech Indonesia",
+  "username": "techcompany",
+  "password": "company123"
+}
+
+### Login Student
+# @name PostLoginStudent
+POST {{BaseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "student1",
+  "password": "student123"
+}
+
+> {%
+    client.global.set("studentToken", response.body.data.authToken);
+    client.global.set("studentRefreshToken", response.body.data.refreshToken);
+    client.global.set("studentId", response.body.data.userId);
+%}
+
+### Login Company
+# @name PostLoginCompany
+POST {{BaseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "techcompany",
+  "password": "company123"
+}
+
+> {%
+    client.global.set("companyToken", response.body.data.authToken);
+    client.global.set("companyRefreshToken", response.body.data.refreshToken);
+    client.global.set("companyId", response.body.data.userId);
+%}
+
+### ---------------------------------------
+## Internships (Company)
+### ---------------------------------------
+
+### Membuat lowongan magang baru (Company)
+# @name PostInternship
+POST {{BaseUrl}}/internships
+Authorization: Bearer {{companyToken}}
+Content-Type: application/json
+
+{
+  "title": "Backend Developer Intern",
+  "description": "Mencari mahasiswa yang tertarik dengan pengembangan backend menggunakan Kotlin dan Spring Boot",
+  "category": "IT",
+  "location": "Remote",
+  "duration": "3 bulan",
+  "requirement": "Memahami Kotlin/Java, familiar dengan REST API, memiliki laptop sendiri",
+  "benefit": "Sertifikat magang, uang saku Rp 1.500.000/bulan, mentoring dari senior developer",
+  "deadline": "2026-05-30"
+}
+
+> {%
+    client.global.set("internshipId", response.body.data.internshipId);
+%}
+
+### Mengambil semua lowongan (Student)
+# @name GetInternships
+GET {{BaseUrl}}/internships?search=backend&category=IT&location=Remote
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+### Mengambil detail lowongan
+# @name GetInternshipById
+GET {{BaseUrl}}/internships/{{internshipId}}
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+### ---------------------------------------
+## Applications (Student)
+### ---------------------------------------
+
+### Melamar magang
+# @name PostApplication
+POST {{BaseUrl}}/applications
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+  "internshipId": "{{internshipId}}",
+  "motivation": "Saya sangat tertarik dengan posisi Backend Developer karena memiliki passion di bidang pengembangan backend"
+}
+
+> {%
+    client.global.set("applicationId", response.body.data.applicationId);
+%}
+
+### Upload CV
+# @name UploadCV
+PUT {{BaseUrl}}/applications/{{applicationId}}/cv
+Authorization: Bearer {{studentToken}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="my_cv.pdf"
+Content-Type: application/pdf
+
+< ./uploads/cvs/my_cv.pdf
+--WebAppBoundary--
+
+### Melihat daftar lamaran saya
+# @name GetMyApplications
+GET {{BaseUrl}}/applications/my
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+### ---------------------------------------
+## Applications (Company)
+### ---------------------------------------
+
+### Melihat daftar pelamar untuk lowongan tertentu
+# @name GetApplicationsByInternship
+GET {{BaseUrl}}/applications/internship/{{internshipId}}
+Authorization: Bearer {{companyToken}}
+Content-Type: application/json
+
+### Update status lamaran (Company)
+# @name UpdateApplicationStatus
+PUT {{BaseUrl}}/applications/{{applicationId}}/status
+Authorization: Bearer {{companyToken}}
+Content-Type: application/json
+
+{
+  "status": "accepted"
+}
