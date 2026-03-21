@@ -12,15 +12,12 @@ import kotlinx.coroutines.withContext
 import org.delcom.data.AppException
 import org.delcom.data.DataResponse
 import org.delcom.data.InternshipRequest
-import org.delcom.helpers.ServiceHelper
 import org.delcom.helpers.ValidatorHelper
 import org.delcom.repositories.IInternshipRepository
-import org.delcom.repositories.IUserRepository
 import java.io.File
 import java.util.*
 
 class InternshipService(
-    private val userRepo: IUserRepository,
     private val internshipRepo: IInternshipRepository
 ) {
     suspend fun getAll(call: ApplicationCall) {
@@ -58,14 +55,11 @@ class InternshipService(
     }
 
     suspend fun post(call: ApplicationCall) {
-        val user = ServiceHelper.getAuthUser(call, userRepo)
-
         val request = call.receive<InternshipRequest>()
-        request.companyId = user.id
-        request.companyName = user.name
-        request.companyEmail = user.username
 
         val validator = ValidatorHelper(request.toMap())
+        validator.required("companyName", "Nama perusahaan tidak boleh kosong")
+        validator.required("companyEmail", "Email perusahaan tidak boleh kosong")
         validator.required("title", "Judul lowongan tidak boleh kosong")
         validator.required("description", "Deskripsi tidak boleh kosong")
         validator.required("category", "Kategori tidak boleh kosong")
@@ -90,11 +84,11 @@ class InternshipService(
         val internshipId = call.parameters["id"]
             ?: throw AppException(400, "ID lowongan tidak valid!")
 
-        val user = ServiceHelper.getAuthUser(call, userRepo)
-
         val request = call.receive<InternshipRequest>()
 
         val validator = ValidatorHelper(request.toMap())
+        validator.required("companyName", "Nama perusahaan tidak boleh kosong")
+        validator.required("companyEmail", "Email perusahaan tidak boleh kosong")
         validator.required("title", "Judul lowongan tidak boleh kosong")
         validator.required("description", "Deskripsi tidak boleh kosong")
         validator.required("category", "Kategori tidak boleh kosong")
@@ -105,12 +99,11 @@ class InternshipService(
         validator.validate()
 
         val oldInternship = internshipRepo.getById(internshipId)
-        if (oldInternship == null || oldInternship.companyId != user.id) {
-            throw AppException(404, "Lowongan tidak ditemukan atau Anda bukan pemiliknya!")
+        if (oldInternship == null) {
+            throw AppException(404, "Lowongan tidak ditemukan!")
         }
 
         request.cover = oldInternship.cover
-        request.companyId = user.id
 
         val isUpdated = internshipRepo.update(internshipId, request.toEntity())
         if (!isUpdated) {
@@ -129,11 +122,9 @@ class InternshipService(
         val internshipId = call.parameters["id"]
             ?: throw AppException(400, "ID lowongan tidak valid!")
 
-        val user = ServiceHelper.getAuthUser(call, userRepo)
-
         val oldInternship = internshipRepo.getById(internshipId)
-        if (oldInternship == null || oldInternship.companyId != user.id) {
-            throw AppException(404, "Lowongan tidak ditemukan atau Anda bukan pemiliknya!")
+        if (oldInternship == null) {
+            throw AppException(404, "Lowongan tidak ditemukan!")
         }
 
         val isDeleted = internshipRepo.delete(internshipId)
@@ -160,10 +151,7 @@ class InternshipService(
         val internshipId = call.parameters["id"]
             ?: throw AppException(400, "ID lowongan tidak valid!")
 
-        val user = ServiceHelper.getAuthUser(call, userRepo)
-
         val request = InternshipRequest()
-        request.companyId = user.id
 
         val multipartData = call.receiveMultipart(formFieldLimit = 1024 * 1024 * 5)
         multipartData.forEachPart { part ->
@@ -199,8 +187,8 @@ class InternshipService(
         }
 
         val oldInternship = internshipRepo.getById(internshipId)
-        if (oldInternship == null || oldInternship.companyId != user.id) {
-            throw AppException(404, "Lowongan tidak ditemukan atau Anda bukan pemiliknya!")
+        if (oldInternship == null) {
+            throw AppException(404, "Lowongan tidak ditemukan!")
         }
 
         request.title = oldInternship.title
@@ -211,6 +199,9 @@ class InternshipService(
         request.requirement = oldInternship.requirement
         request.benefit = oldInternship.benefit
         request.deadline = oldInternship.deadline
+        request.companyName = oldInternship.companyName
+        request.companyEmail = oldInternship.companyEmail
+        request.submissionDate = oldInternship.submissionDate
 
         val isUpdated = internshipRepo.update(internshipId, request.toEntity())
         if (!isUpdated) {

@@ -4,7 +4,6 @@ import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 
 object InternshipTable : UUIDTable("internships") {
-    val companyId = uuid("company_id")
     val companyName = varchar("company_name", 200)
     val companyEmail = varchar("company_email", 100)
     val title = varchar("title", 200)

@@ -32,7 +32,7 @@ fun appModule(jwtSecret: String) = module {
 
     // Internship Service
     single {
-        InternshipService(get(), get())
+        InternshipService(get())
     }
 
     // Application Repository

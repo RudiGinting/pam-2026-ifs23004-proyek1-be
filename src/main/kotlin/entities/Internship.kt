@@ -9,7 +9,6 @@ import java.util.UUID
 @Serializable
 data class Internship(
     var id: String = UUID.randomUUID().toString(),
-    var companyId: String,
     var companyName: String,
     var companyEmail: String,
     var title: String,

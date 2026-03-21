@@ -6,7 +6,6 @@ import org.delcom.entities.Internship
 
 @Serializable
 data class InternshipRequest(
-    var companyId: String = "",
     var companyName: String = "",
     var companyEmail: String = "",
     var title: String = "",
@@ -17,13 +16,11 @@ data class InternshipRequest(
     var requirement: String = "",
     var benefit: String? = null,
     var deadline: String = "",
-    var status: String = "Open",
     var submissionDate: String = "",
     var cover: String? = null,
 ){
     fun toMap(): Map<String, Any?> {
         return mapOf(
-            "companyId" to companyId,
             "companyName" to companyName,
             "companyEmail" to companyEmail,
             "title" to title,
@@ -34,7 +31,6 @@ data class InternshipRequest(
             "requirement" to requirement,
             "benefit" to benefit,
             "deadline" to deadline,
-            "status" to status,
             "submissionDate" to submissionDate,
             "cover" to cover
         )
@@ -42,7 +38,6 @@ data class InternshipRequest(
 
     fun toEntity(): Internship {
         return Internship(
-            companyId = companyId,
             companyName = companyName,
             companyEmail = companyEmail,
             title = title,
@@ -53,7 +48,7 @@ data class InternshipRequest(
             requirement = requirement,
             benefit = benefit,
             deadline = deadline,
-            status = status,
+            status = "Open",
             applicantsCount = 0,
             submissionDate = submissionDate,
             cover = cover,

@@ -34,10 +34,8 @@ fun refreshTokenDAOToModel(dao: RefreshTokenDAO) = RefreshToken(
     dao.createdAt,
 )
 
-// PERBAIKAN: Tambahkan semua parameter yang diperlukan untuk Internship
 fun internshipDAOToModel(dao: InternshipDAO) = Internship(
     id = dao.id.value.toString(),
-    companyId = dao.companyId.toString(),
     companyName = dao.companyName,
     companyEmail = dao.companyEmail,
     title = dao.title,

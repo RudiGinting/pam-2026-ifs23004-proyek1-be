@@ -40,66 +40,28 @@ class ApplicationService(
         call.respond(response)
     }
 
-    suspend fun getApplicationsByInternship(call: ApplicationCall) {
-        val internshipId = call.parameters["internshipId"]
-            ?: throw AppException(400, "ID lowongan tidak valid!")
-
-        val applications = applicationRepo.getByInternship(internshipId)
-
-        val response = DataResponse(
-            "success",
-            "Berhasil mengambil daftar pelamar",
-            mapOf(Pair("applications", applications))
-        )
-        call.respond(response)
-    }
-
     suspend fun post(call: ApplicationCall) {
         val user = ServiceHelper.getAuthUser(call, userRepo)
 
         val request = call.receive<ApplicationRequest>()
-        request.studentId = user.id
 
         val validator = ValidatorHelper(request.toMap())
         validator.required("internshipId", "ID lowongan tidak boleh kosong")
         validator.required("motivation", "Motivasi tidak boleh kosong")
         validator.validate()
 
-        // Cek apakah lowongan tersedia
         val internship = internshipRepo.getById(request.internshipId)
         if (internship == null) {
             throw AppException(404, "Lowongan magang tidak ditemukan!")
         }
 
-        val applicationId = applicationRepo.create(request.toEntity())
+        val application = request.toEntity().copy(studentId = user.id)
+        val applicationId = applicationRepo.create(application)
 
         val response = DataResponse(
             "success",
             "Berhasil mengirim lamaran magang",
             mapOf(Pair("applicationId", applicationId))
-        )
-        call.respond(response)
-    }
-
-    suspend fun updateStatus(call: ApplicationCall) {
-        val applicationId = call.parameters["id"]
-            ?: throw AppException(400, "ID lamaran tidak valid!")
-
-        val request = call.receive<ApplicationRequest>()
-
-        val validator = ValidatorHelper(request.toMap())
-        validator.required("status", "Status tidak boleh kosong")
-        validator.validate()
-
-        val isUpdated = applicationRepo.updateStatus(applicationId, request.status)
-        if (!isUpdated) {
-            throw AppException(400, "Gagal memperbarui status lamaran!")
-        }
-
-        val response = DataResponse(
-            "success",
-            "Berhasil mengubah status lamaran",
-            null
         )
         call.respond(response)
     }

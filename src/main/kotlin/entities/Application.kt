@@ -12,8 +12,8 @@ data class Application(
     var internshipId: String,
     var studentId: String,
     var motivation: String,
-    var cvUrl: String?,
-    var status: String = "pending", // pending, accepted, rejected
+    var cvUrl: String? = null,
+    var status: String = "pending",
     var appliedAt: Instant = Clock.System.now(),
 
     @Contextual

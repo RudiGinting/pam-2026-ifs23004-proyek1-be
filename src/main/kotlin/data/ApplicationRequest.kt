@@ -1,33 +1,32 @@
 package org.delcom.data
 
+import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 import org.delcom.entities.Application
 
 @Serializable
 data class ApplicationRequest(
     var internshipId: String = "",
-    var studentId: String = "",
     var motivation: String = "",
     var cvUrl: String? = null,
-    var status: String = "pending",
 ){
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "internshipId" to internshipId,
-            "studentId" to studentId,
             "motivation" to motivation,
-            "cvUrl" to cvUrl,
-            "status" to status
+            "cvUrl" to cvUrl
         )
     }
 
     fun toEntity(): Application {
         return Application(
             internshipId = internshipId,
-            studentId = studentId,
+            studentId = "", // akan diisi di service
             motivation = motivation,
             cvUrl = cvUrl,
-            status = status
+            status = "pending",
+            appliedAt = Clock.System.now(),
+            updatedAt = Clock.System.now()
         )
     }
 }

@@ -66,8 +66,52 @@ fun Application.configureRouting() {
             }
         }
 
+        // Route Internships (Public - tanpa auth untuk melihat)
+        route("/internships") {
+            get {
+                internshipService.getAll(call)
+            }
+            get("/{id}") {
+                internshipService.getById(call)
+            }
+
+            // Protected routes untuk create, update, delete
+            authenticate(JWTConstants.NAME) {
+                post {
+                    internshipService.post(call)
+                }
+                put("/{id}") {
+                    internshipService.put(call)
+                }
+                put("/{id}/cover") {
+                    internshipService.putCover(call)
+                }
+                delete("/{id}") {
+                    internshipService.delete(call)
+                }
+            }
+        }
+
+        // Route Applications (hanya untuk user yang login)
         authenticate(JWTConstants.NAME) {
-            // Route User
+            route("/applications") {
+                get("/my") {
+                    applicationService.getMyApplications(call)
+                }
+                post {
+                    applicationService.post(call)
+                }
+                put("/{id}/cv") {
+                    applicationService.uploadCV(call)
+                }
+                delete("/{id}") {
+                    applicationService.delete(call)
+                }
+            }
+        }
+
+        // Route Users
+        authenticate(JWTConstants.NAME) {
             route("/users") {
                 get("/me") {
                     userService.getMe(call)
@@ -80,50 +124,6 @@ fun Application.configureRouting() {
                 }
                 put("/me/photo") {
                     userService.putMyPhoto(call)
-                }
-            }
-
-            // Route Internships (Lowongan Magang)
-            route("/internships") {
-                get {
-                    internshipService.getAll(call)
-                }
-                post {
-                    internshipService.post(call)
-                }
-                get("/{id}") {
-                    internshipService.getById(call)
-                }
-                put("/{id}") {
-                    internshipService.put(call)
-                }
-                put("/{id}/cover") {
-                    internshipService.putCover(call)
-                }
-                delete("/{id}") {
-                    internshipService.delete(call)
-                }
-            }
-
-            // Route Applications (Lamaran Magang)
-            route("/applications") {
-                get("/my") {
-                    applicationService.getMyApplications(call)
-                }
-                get("/internship/{internshipId}") {
-                    applicationService.getApplicationsByInternship(call)
-                }
-                post {
-                    applicationService.post(call)
-                }
-                put("/{id}/status") {
-                    applicationService.updateStatus(call)
-                }
-                put("/{id}/cv") {
-                    applicationService.uploadCV(call)
-                }
-                delete("/{id}") {
-                    applicationService.delete(call)
                 }
             }
         }

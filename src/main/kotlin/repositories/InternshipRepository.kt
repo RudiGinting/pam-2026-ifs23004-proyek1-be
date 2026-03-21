@@ -10,8 +10,8 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.lowerCase
-import org.jetbrains.exposed.sql.or  // TAMBAHKAN IMPORT INI
 import java.util.*
+import org.jetbrains.exposed.sql.or
 
 class InternshipRepository : IInternshipRepository {
     override suspend fun getAll(
@@ -31,11 +31,9 @@ class InternshipRepository : IInternshipRepository {
         } else {
             val keyword = "%${search.lowercase()}%"
             InternshipDAO.find {
-                // PERBAIKAN: Gunakan or() function
                 val titleCondition = InternshipTable.title.lowerCase() like keyword
                 val descriptionCondition = InternshipTable.description.lowerCase() like keyword
-                var op = titleCondition or descriptionCondition  // Gunakan or di sini
-
+                var op = titleCondition or descriptionCondition
                 if (category != null) op = op and (InternshipTable.category eq category)
                 if (location != null) op = op and (InternshipTable.location eq location)
                 op
@@ -58,7 +56,6 @@ class InternshipRepository : IInternshipRepository {
 
     override suspend fun create(internship: Internship): String = suspendTransaction {
         val internshipDAO = InternshipDAO.new {
-            companyId = UUID.fromString(internship.companyId)
             companyName = internship.companyName
             companyEmail = internship.companyEmail
             title = internship.title

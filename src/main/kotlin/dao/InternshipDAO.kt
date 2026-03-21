@@ -9,7 +9,6 @@ import java.util.UUID
 class InternshipDAO(id: EntityID<UUID>) : Entity<UUID>(id) {
     companion object : EntityClass<UUID, InternshipDAO>(InternshipTable)
 
-    var companyId by InternshipTable.companyId
     var companyName by InternshipTable.companyName
     var companyEmail by InternshipTable.companyEmail
     var title by InternshipTable.title
